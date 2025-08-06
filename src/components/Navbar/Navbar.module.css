@@ -1,0 +1,8 @@
+h3{
+    padding: 1rem;
+    background-color: var(--light-blue);
+    color: var(--darkest-blue);
+    box-shadow: 2px 1px 9px var(--darkest-blue);
+    margin-bottom: var(--spacing);
+    text-align: center;
+}

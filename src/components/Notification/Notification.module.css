@@ -1,0 +1,17 @@
+.notif{
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem 1.5rem;
+    z-index: 800;
+    transform: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.success{
+    background-color:  #82c483;
+}
+
+.error{
+    background-color: #e95349;
+}
