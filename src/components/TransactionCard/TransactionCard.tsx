@@ -5,18 +5,27 @@ import { useTransactions } from "../../hooks/transaction.hooks";
 
 type CardProps = {
   onEdit: (id: string) => void;
+  searchQuery: string;
 };
 
-const TransactionCard = ({ onEdit }: CardProps) => {
+const TransactionCard = ({ onEdit, searchQuery }: CardProps) => {
   const {transactions} = useTransactionContext();
   const { deleteTransaction } = useTransactions();
+
+  const filteredTransactions = transactions.filter((transaction) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      transaction.title.toLowerCase().includes(q) ||
+      transaction.category.toLowerCase().includes(q)
+    );
+  });
 
   if (transactions.length === 0) {
     return <div>No transactions found.</div>;
   }
   return (
     <div className={styles.cardContainer}>
-      {transactions.map((t)=>(
+      {filteredTransactions.map((t)=>(
         <div className={styles.card} key={t.id}>
           <div className={styles.info}>
             <div className={styles.details}>

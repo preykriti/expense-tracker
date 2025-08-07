@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {type Transaction } from "../../types/Transaction";
 import { Timestamp } from "firebase/firestore";
-import "./InputForm.module.css"
+import styles from "./InputForm.module.css"
 import { useTransactions } from "../../hooks/transaction.hooks";
 
 
@@ -114,7 +114,7 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
             <textarea name="description" value={formData.description} id="description" onChange={handleChange}></textarea>
         </label>
 
-        <button type="submit">Submit</button>
+        <button className={styles.submitBtn} type="submit">Submit</button>
     </form>
     </>
   )
