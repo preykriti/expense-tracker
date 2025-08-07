@@ -1,0 +1,24 @@
+.addBtn{
+    width: 10rem;
+    color: var(--darkest-blue);
+    box-shadow: 2px 1px 9px var(--darkest-blue);
+    background-color: var(--light-blue);
+    margin-left: 3rem;
+}
+
+.formContainer{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.form{
+    width: 40%;
+}
