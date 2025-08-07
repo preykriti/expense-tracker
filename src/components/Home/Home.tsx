@@ -6,12 +6,14 @@ import Notification from "../Notification/Notification"
 import TransactionCard from "../TransactionCard/TransactionCard"
 import { useTransactions } from "../../hooks/transaction.hooks"
 import type { Transaction } from "../../types/Transaction"
+import Navbar from "../Navbar/Navbar"
 
 const Home = () => {
     const [showForm, setShowForm] = useState(false);
     const [editTransaction, setEditTransaction] = useState<Transaction | null> (null);
     const {transactions}  = useTransactions();
     const [notification, setNotification] = useState<{message: string; type: "success" | "error"} | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const showNotification = (message: string, type: "success" | "error") => {
         setNotification({message, type});
@@ -41,9 +43,21 @@ const Home = () => {
             />
         )}
        
+        <Navbar />
         <Totals />
-        <button className={styles.addBtn} onClick={toggleForm}>+</button>
-        <TransactionCard onEdit={handleEdit}/>
+        <div className={styles.topContainer}>
+            <button className={styles.addBtn} onClick={toggleForm}>Add</button>
+            
+                <input
+                    type="text"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                />
+         
+        </div>
+        <TransactionCard onEdit={handleEdit} searchQuery={searchQuery}/>
 
         {showForm && (
             <div className={styles.formContainer} onClick={toggleForm}>

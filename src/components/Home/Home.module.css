@@ -1,11 +1,28 @@
+.topContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    margin: 0 3rem;
+    margin-bottom: var(--spacing);
+}   
+
 .addBtn{
-    width: 3rem;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    border-radius: 5px;
+    border: none;
     color: white;
     box-shadow: 2px 1px 9px var(--darkest-blue);
     background-color: var(--darkest-blue);
-    margin-left: 3rem;
-    margin-bottom: var(--spacing);
+    
 }
+
+.searchInput {
+    border: 1px solid var(--darkest-blue);
+    width: 20rem;
+}
+
 
 .formContainer{
     position: fixed;

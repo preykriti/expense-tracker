@@ -28,7 +28,7 @@ input, select, textarea{
 
 
 
-button{
+.submitBtn{
     padding: 0.5rem;
     margin: 0 auto;
     border-radius: 5px;
