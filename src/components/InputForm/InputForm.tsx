@@ -1,11 +1,16 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import {type Transaction } from "../../types/Transaction";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { db } from "../../firebase";
+import { Timestamp } from "firebase/firestore";
 import "./InputForm.module.css"
+import { useTransactions } from "../../hooks/transaction.hooks";
 
 
-const InputForm = () => {
+type InputFormProps = {
+    onClose: () => void;
+    showNotification: (message: string, type: "success" | "error") => void;
+};
+
+const InputForm = ({ onClose, showNotification }: InputFormProps) => {
     const [formData, setFormData] = useState<Omit<Transaction, "id" | "createdAt">>({
         title: '',
         type: 'expense',
@@ -14,31 +19,28 @@ const InputForm = () => {
         description : '' 
     })
 
+    const {addTransaction} = useTransactions();
+
     const expenseCategories = ["Food", "Transportation", "Health", "Entertainment", "Utilities", "Other"];
     const incomeCategories = ["Salary", "Business", "Investments", "Loans", "Gifts", "Other"];
-    const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
-
-    const showNotification = (message: string, type: "success" | "error") => {
-        setNotification({message, type});
-    }
 
     const handleSubmit = async (e:FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         console.log("about to submit");
-        if(!formData.title || formData.amount <= 0 || !formData.category){
+
+        if(!formData.title.trim() || formData.amount <= 0 || !formData.category){
             showNotification("Title, amount and category cannot be empty!", "error");
             return;
         }
 
         try {
-            await addDoc(collection(db, "transactions"),{
+            await addTransaction({
                 ...formData,
                 amount: Number(formData.amount),
-                description: formData.description || null,
-                createdAt: Timestamp.now()
-            });
+                createdAt: Timestamp.now()});
 
             console.log("added transaction");
+
             showNotification("Transaction added", "success");
 
             setFormData({
@@ -48,6 +50,8 @@ const InputForm = () => {
                 category: "",
                 description: "",
             });
+
+            onClose();
             
         } catch (error) {
             console.log(error);

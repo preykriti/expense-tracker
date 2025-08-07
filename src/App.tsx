@@ -1,19 +1,23 @@
 
 import './App.css'
-// import InputForm from './components/InputForm/InputForm'
-import Navbar from './components/Navbar/Navbar'
-import Totals from './components/Totals/Totals'
-import TransactionList from './components/TransactionList/TransactionList'
+
+import Home from './components/Home/Home.tsx'
+import Navbar from './components/Navbar/Navbar.tsx'
 
 function App() {
-  
+  // const { setTransactions } = useTransactionContext();
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const res = await useFetchTransactions();
+  //     setTransactions(res);
+  //   };
+  //   fetchData();
+  // }, []);
   return (
     <>
       <Navbar/>
-      <Totals/>
-      {/* <InputForm/> */}
-      <TransactionList/>
+      <Home />
     </>
   )
 }
