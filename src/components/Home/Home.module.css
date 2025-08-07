@@ -1,9 +1,10 @@
 .addBtn{
-    width: 10rem;
-    color: var(--darkest-blue);
+    width: 3rem;
+    color: white;
     box-shadow: 2px 1px 9px var(--darkest-blue);
-    background-color: var(--light-blue);
+    background-color: var(--darkest-blue);
     margin-left: 3rem;
+    margin-bottom: var(--spacing);
 }
 
 .formContainer{

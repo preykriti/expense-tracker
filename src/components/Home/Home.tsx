@@ -2,11 +2,15 @@ import { useState } from "react"
 import InputForm from "../InputForm/InputForm"
 import styles from "./Home.module.css"
 import Totals from "../Totals/Totals"
-import TransactionList from "../TransactionList/TransactionList"
 import Notification from "../Notification/Notification"
+import TransactionCard from "../TransactionCard/TransactionCard"
+import { useTransactions } from "../../hooks/transaction.hooks"
+import type { Transaction } from "../../types/Transaction"
 
 const Home = () => {
     const [showForm, setShowForm] = useState(false);
+    const [editTransaction, setEditTransaction] = useState<Transaction | null> (null);
+    const {transactions}  = useTransactions();
     const [notification, setNotification] = useState<{message: string; type: "success" | "error"} | null>(null);
 
     const showNotification = (message: string, type: "success" | "error") => {
@@ -16,6 +20,16 @@ const Home = () => {
     const toggleForm = () => {  
         setShowForm(prev => !prev);
     }
+
+    const handleEdit = (id: string)=>{
+         const tx = transactions.find(t => t.id === id);
+        if (tx) {
+            setEditTransaction(tx);
+            setShowForm(true);
+        }
+    }
+
+    useTransactions();
 
   return (
     <div>
@@ -28,13 +42,15 @@ const Home = () => {
         )}
        
         <Totals />
-        <button className={styles.addBtn} onClick={toggleForm}>Add Transaction</button>
-        {/* <TransactionList /> */}
+        <button className={styles.addBtn} onClick={toggleForm}>+</button>
+        <TransactionCard onEdit={handleEdit}/>
 
         {showForm && (
             <div className={styles.formContainer} onClick={toggleForm}>
                 <div className={styles.form} onClick={(e) => e.stopPropagation()}>
-                    <InputForm onClose={()=>{setShowForm(false)}} showNotification={showNotification}/>
+                    <InputForm onClose={()=>{setShowForm(false) 
+                        setEditTransaction(null);
+                    }} showNotification={showNotification} editableTransaction={editTransaction}/>
                 </div>
             </div>
 

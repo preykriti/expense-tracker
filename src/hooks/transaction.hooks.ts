@@ -4,12 +4,6 @@ import { db } from "../firebase";
 import { useTransactionContext } from "../context/TransactionContext";
 import { useEffect } from "react";
 
-// export const addTransaction = async (payload: Omit<Transaction, "id">) => {
-//     const response = await addDoc(collection(db, "transactions"),payload);
-//     console.log(response);
-    
-// }
-
 export const useTransactions =() => {
     const {transactions, setTransactions} = useTransactionContext();
     

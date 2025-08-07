@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {type Transaction } from "../../types/Transaction";
 import { Timestamp } from "firebase/firestore";
 import "./InputForm.module.css"
@@ -8,9 +8,10 @@ import { useTransactions } from "../../hooks/transaction.hooks";
 type InputFormProps = {
     onClose: () => void;
     showNotification: (message: string, type: "success" | "error") => void;
+    editableTransaction?: Transaction | null;
 };
 
-const InputForm = ({ onClose, showNotification }: InputFormProps) => {
+const InputForm = ({ onClose, showNotification, editableTransaction }: InputFormProps) => {
     const [formData, setFormData] = useState<Omit<Transaction, "id" | "createdAt">>({
         title: '',
         type: 'expense',
@@ -19,7 +20,20 @@ const InputForm = ({ onClose, showNotification }: InputFormProps) => {
         description : '' 
     })
 
-    const {addTransaction} = useTransactions();
+    useEffect(() => {
+        if(editableTransaction) {
+            const {title, type, amount, category, description} = editableTransaction;
+            setFormData({
+              title,
+                type,
+                amount,
+                category,
+                description: description || "", 
+            });
+        }
+    },[editableTransaction]);
+
+    const {addTransaction, updateTransaction} = useTransactions();
 
     const expenseCategories = ["Food", "Transportation", "Health", "Entertainment", "Utilities", "Other"];
     const incomeCategories = ["Salary", "Business", "Investments", "Loans", "Gifts", "Other"];
@@ -34,22 +48,23 @@ const InputForm = ({ onClose, showNotification }: InputFormProps) => {
         }
 
         try {
-            await addTransaction({
-                ...formData,
-                amount: Number(formData.amount),
-                createdAt: Timestamp.now()});
+            if(editableTransaction){
+                await updateTransaction(editableTransaction.id, {
+                    ...formData,
+                    amount: Number(formData.amount)}
+                );
+                showNotification("Transaction updated", "success");
+            }
+            else{
+                await addTransaction({
+                    ...formData,
+                    amount: Number(formData.amount),
+                    createdAt: Timestamp.now()});
 
-            console.log("added transaction");
+                console.log("added transaction");
 
-            showNotification("Transaction added", "success");
-
-            setFormData({
-                title: "",
-                type: "expense",
-                amount: 0,
-                category: "",
-                description: "",
-            });
+                showNotification("Transaction added", "success");
+            }
 
             onClose();
             
