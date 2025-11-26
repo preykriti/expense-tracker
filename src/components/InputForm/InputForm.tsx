@@ -1,9 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import {type Transaction } from "../../types/Transaction";
+import {type Transaction, type TransactionInput } from "../../types/Transaction";
 import { Timestamp } from "firebase/firestore";
 import styles from "./InputForm.module.css"
 import { useTransactions } from "../../hooks/transaction.hooks";
-
 
 type InputFormProps = {
     onClose: () => void;
@@ -12,12 +11,13 @@ type InputFormProps = {
 };
 
 const InputForm = ({ onClose, showNotification, editableTransaction }: InputFormProps) => {
-    const [formData, setFormData] = useState<Omit<Transaction, "id" | "createdAt">>({
+    const [formData, setFormData] = useState<TransactionInput>({
         title: '',
         type: 'expense',
         amount: 0,
         category: '',
-        description : '' 
+        description : '' ,
+        date: '',
     })
 
     useEffect(() => {
@@ -29,6 +29,7 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
                 amount,
                 category,
                 description: description || "", 
+                date: editableTransaction.date || "",
             });
         }
     },[editableTransaction]);
@@ -83,11 +84,11 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
   return (
     <>
     <form onSubmit={handleSubmit} >
-        <label>Title
+        <label htmlFor="title">Title
             <input type="text" id="title" name="title" value = {formData.title} onChange = {handleChange}/>
         </label>
 
-        <label>
+        <label htmlFor="type-dropdown">
             Type
             <select id="type-dropdown" name="type" value = {formData.type} onChange = {handleChange}>
                 <option value="expense">Expense</option>
@@ -95,12 +96,12 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
             </select>
         </label>
 
-        <label>
+        <label htmlFor="amount">
             Amount:
             <input type="number" id="amount" name="amount" value = {formData.amount} onChange = {handleChange}/>
         </label>
 
-        <label>
+        <label htmlFor="category">
             Category:
             <select name = "category" value={formData.category} onChange={handleChange}>
                 <option value="">Select a category</option>
@@ -109,7 +110,7 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
             </select>
         </label>
 
-        <label>
+        <label htmlFor="description">
             Description:
             <textarea name="description" value={formData.description} id="description" onChange={handleChange}></textarea>
         </label>

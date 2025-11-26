@@ -1,6 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import type { Transaction } from "../types/Transaction";
-import { db } from "../firebase";
+import { db } from "../firebase/firebaseConfig";
 import { useTransactionContext } from "../context/TransactionContext";
 import { useEffect } from "react";
 

@@ -7,7 +7,18 @@ export interface Transaction{
     amount: number;
     category: string;
     description : string;
+    date: string;
     createdAt: Timestamp;
+}
+
+
+export interface TransactionInput{
+  title: string;
+  type: 'income' | 'expense';
+  amount: number;
+  category: string;
+  description : string;
+  date: string;
 }
 
 export type NotificationProps = {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./Totals.module.css";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../../firebase/firebaseConfig";
 import type { Transaction } from "../../types/Transaction";
 
 const Totals = () => {
