@@ -1,5 +1,3 @@
-import type { Timestamp } from "firebase/firestore";
-
 export interface Transaction{
     id : string;
     title: string;
@@ -11,7 +9,6 @@ export interface Transaction{
     createdAt: Date;
 }
 
-
 export interface TransactionInput{
   title: string;
   type: 'income' | 'expense';
@@ -21,14 +18,7 @@ export interface TransactionInput{
   date: Date;
 }
 
-export type NotificationProps = {
-    message: string;
-    type: "success" | "error";
-    onClose: ()=>void;
-}
-
 export type TransactionListProps = {
   onAddClick: () => void;
   onEditClick: (transaction: Transaction) => void;
-  showNotification: (msg: string, type: "success" | "error") => void;
 };

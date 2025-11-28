@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { registerUser } from "../../firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuthContext();
 
@@ -16,13 +16,13 @@ const SignUp = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     try {
       await registerUser(email, password);
       navigate("/");
+      toast.success("Signed up successfully");
     } catch (err: any) {
-      setError(err.message);
+      toast.error("Failed to sign up: " + err.message);
     }
   };
 

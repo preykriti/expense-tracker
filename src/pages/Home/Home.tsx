@@ -2,7 +2,6 @@ import { useState } from "react"
 import InputForm from "../../components/InputForm/InputForm"
 import styles from "./Home.module.css"
 import Totals from "../../components/Totals/Totals"
-import Notification from "../../components/Notification/Notification"
 import TransactionCard from "../../components/TransactionCard/TransactionCard"
 import type { Transaction } from "../../types/Transaction"
 import { useTransactionContext } from "../../context/TransactionContext"
@@ -12,12 +11,8 @@ const Home = () => {
     const [showForm, setShowForm] = useState<boolean>(false);
     const [editTransaction, setEditTransaction] = useState<Transaction | null> (null);
     const {transactions}  = useTransactionContext();
-    const [notification, setNotification] = useState<{message: string; type: "success" | "error"} | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
 
-    const showNotification = (message: string, type: "success" | "error") => {
-        setNotification({message, type});
-    };
 
     const toggleForm = () => {  
         setShowForm(prev => !prev);
@@ -34,13 +29,6 @@ const Home = () => {
 
   return (
     <div>
-        {notification && (
-            <Notification 
-                message={notification.message} 
-                type={notification.type} 
-                onClose={() => setNotification(null)} 
-            />
-        )}
        
         <Navbar />
         <Totals />
@@ -63,7 +51,7 @@ const Home = () => {
                 <div className={styles.form} onClick={(e) => e.stopPropagation()}>
                     <InputForm onClose={()=>{setShowForm(false) 
                         setEditTransaction(null);
-                    }} showNotification={showNotification} editableTransaction={editTransaction}/>
+                    }} editableTransaction={editTransaction}/>
                 </div>
             </div>
 

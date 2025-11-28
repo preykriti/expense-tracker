@@ -1,16 +1,15 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {type Transaction, type TransactionInput } from "../../types/Transaction";
-import { Timestamp } from "firebase/firestore";
 import styles from "./InputForm.module.css"
 import { useTransactionContext } from "../../context/TransactionContext";
+import { toast } from "react-toastify";
 
 type InputFormProps = {
     onClose: () => void;
-    showNotification: (message: string, type: "success" | "error") => void;
     editableTransaction?: Transaction | null;
 };
 
-const InputForm = ({ onClose, showNotification, editableTransaction }: InputFormProps) => {
+const InputForm = ({ onClose, editableTransaction }: InputFormProps) => {
     const [formData, setFormData] = useState<TransactionInput>({
         title: '',
         type: 'expense',
@@ -44,7 +43,7 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
         console.log("about to submit");
 
         if(!formData.title.trim() || formData.amount <= 0 || !formData.category){
-            showNotification("Title, amount and category cannot be empty!", "error");
+            toast.error("Title, amount and category cannot be empty!");
             return;
         }
 
@@ -54,7 +53,7 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
                     ...formData,
                     amount: Number(formData.amount)}
                 );
-                showNotification("Transaction updated", "success");
+                toast.success("Transaction updated");
             }
             else{
                 await addTransaction({
@@ -64,14 +63,14 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
 
                 console.log("added transaction");
 
-                showNotification("Transaction added", "success");
+                toast.success("Transaction added");
             }
 
             onClose();
             
         } catch (error) {
             console.log(error);
-            showNotification("failed to add transaction", "error");
+            toast.error("Failed to add transaction");
         }
 
         console.log("submited");

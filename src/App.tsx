@@ -8,10 +8,12 @@ import HomeLayout from './layout/HomeLayout/HomeLayout.tsx'
 import History from './pages/History/History.tsx'
 import Budget from './pages/Budget/Budget.tsx'
 import Settings from './pages/Settings/Settings.tsx'
+import { ToastContainer } from 'react-toastify'
 
 function App() {
   return (
     <>
+     <ToastContainer hideProgressBar={true}/>
      <Routes>
         <Route path="/" element={
           <ProtectedRoute>
