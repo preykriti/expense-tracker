@@ -7,8 +7,8 @@ export interface Transaction{
     amount: number;
     category: string;
     description : string;
-    date: string;
-    createdAt: Timestamp;
+    date: Date;
+    createdAt: Date;
 }
 
 
@@ -18,7 +18,7 @@ export interface TransactionInput{
   amount: number;
   category: string;
   description : string;
-  date: string;
+  date: Date;
 }
 
 export type NotificationProps = {
