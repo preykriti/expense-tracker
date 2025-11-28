@@ -1,7 +1,6 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useTransactionContext } from "../../context/TransactionContext";
 import styles from "./TransactionCard.module.css";
-import { useTransactions } from "../../hooks/transaction.hooks";
 
 type CardProps = {
   onEdit: (id: string) => void;
@@ -10,7 +9,7 @@ type CardProps = {
 
 const TransactionCard = ({ onEdit, searchQuery }: CardProps) => {
   const {transactions} = useTransactionContext();
-  const { deleteTransaction } = useTransactions();
+  const { deleteTransaction } = useTransactionContext();
 
   const filteredTransactions = transactions.filter((transaction) => {
     const q = searchQuery.toLowerCase();

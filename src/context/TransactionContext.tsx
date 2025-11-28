@@ -17,6 +17,9 @@ interface TransactionContextType {
     updates: Partial<TransactionInput>
   ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
+  totalIncome: number;
+  totalExpense: number;
+  balance: number;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(
@@ -76,8 +79,12 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     [user]
   );
 
+  const totalIncome = transactions.filter(t => t.type === "income").reduce((sum, t)=> sum + t.amount, 0);
+  const totalExpense = transactions.filter(t => t.type === "expense").reduce((sum, t)=> sum + t.amount, 0);
+  const balance = totalIncome - totalExpense;
+
   return (
-    <TransactionContext.Provider value={{ transactions, loading, addTransaction, updateTransaction, deleteTransaction }}>
+    <TransactionContext.Provider value={{ transactions, loading, addTransaction, updateTransaction, deleteTransaction, totalIncome, totalExpense, balance }}>
       {children}
     </TransactionContext.Provider>
   );

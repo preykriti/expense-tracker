@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../../firebase/auth"
+import { logoutUser } from "../../firebase/auth";
+import styles from "./LogoutButton.module.css";
 
 const LogoutButton = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ const LogoutButton = () => {
     }
 
   return (
-    <button onClick={handleLogout}>Logout</button>
+    <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
   )
 }
 

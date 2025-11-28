@@ -1,19 +1,19 @@
 import { useState } from "react"
-import InputForm from "../InputForm/InputForm"
+import InputForm from "../../components/InputForm/InputForm"
 import styles from "./Home.module.css"
-import Totals from "../Totals/Totals"
-import Notification from "../Notification/Notification"
-import TransactionCard from "../TransactionCard/TransactionCard"
-import { useTransactions } from "../../hooks/transaction.hooks"
+import Totals from "../../components/Totals/Totals"
+import Notification from "../../components/Notification/Notification"
+import TransactionCard from "../../components/TransactionCard/TransactionCard"
 import type { Transaction } from "../../types/Transaction"
-import Navbar from "../Navbar/Navbar"
+import { useTransactionContext } from "../../context/TransactionContext"
+import Navbar from "../../components/Navbar/Navbar"
 
 const Home = () => {
-    const [showForm, setShowForm] = useState(false);
+    const [showForm, setShowForm] = useState<boolean>(false);
     const [editTransaction, setEditTransaction] = useState<Transaction | null> (null);
-    const {transactions}  = useTransactions();
+    const {transactions}  = useTransactionContext();
     const [notification, setNotification] = useState<{message: string; type: "success" | "error"} | null>(null);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const showNotification = (message: string, type: "success" | "error") => {
         setNotification({message, type});
@@ -31,7 +31,6 @@ const Home = () => {
         }
     }
 
-    useTransactions();
 
   return (
     <div>

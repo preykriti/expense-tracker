@@ -2,7 +2,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {type Transaction, type TransactionInput } from "../../types/Transaction";
 import { Timestamp } from "firebase/firestore";
 import styles from "./InputForm.module.css"
-import { useTransactions } from "../../hooks/transaction.hooks";
+import { useTransactionContext } from "../../context/TransactionContext";
 
 type InputFormProps = {
     onClose: () => void;
@@ -17,24 +17,24 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
         amount: 0,
         category: '',
         description : '' ,
-        date: '',
-    })
+        date: new Date(),
+    });
 
     useEffect(() => {
         if(editableTransaction) {
-            const {title, type, amount, category, description} = editableTransaction;
+            const {title, type, amount, category, description, date} = editableTransaction;
             setFormData({
               title,
                 type,
                 amount,
                 category,
                 description: description || "", 
-                date: editableTransaction.date || "",
+                date: date,
             });
         }
     },[editableTransaction]);
 
-    const {addTransaction, updateTransaction} = useTransactions();
+    const {addTransaction, updateTransaction} = useTransactionContext();
 
     const expenseCategories = ["Food", "Transportation", "Health", "Entertainment", "Utilities", "Other"];
     const incomeCategories = ["Salary", "Business", "Investments", "Loans", "Gifts", "Other"];
@@ -60,7 +60,7 @@ const InputForm = ({ onClose, showNotification, editableTransaction }: InputForm
                 await addTransaction({
                     ...formData,
                     amount: Number(formData.amount),
-                    createdAt: Timestamp.now()});
+                   });
 
                 console.log("added transaction");
 
