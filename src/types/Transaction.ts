@@ -4,7 +4,7 @@ export interface Transaction{
     type: 'income' | 'expense';
     amount: number;
     category: string;
-    description : string;
+    description?: string;
     date: Date;
     createdAt: Date;
 }
@@ -14,7 +14,7 @@ export interface TransactionInput{
   type: 'income' | 'expense';
   amount: number;
   category: string;
-  description : string;
+  description?: string;
   date: Date;
 }
 

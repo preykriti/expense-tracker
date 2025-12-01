@@ -60,3 +60,22 @@ textarea {
   padding: 0;
   width: 16px;
 }
+
+.row {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.rowHalf {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+}

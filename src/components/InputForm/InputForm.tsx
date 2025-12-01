@@ -1,43 +1,65 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import {
-  type Transaction,
-  type TransactionInput,
-} from "../../types/Transaction";
+import { useEffect } from "react";
+import { type Transaction } from "../../types/Transaction";
 import styles from "./InputForm.module.css";
 import { useTransactionContext } from "../../context/TransactionContext";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 type InputFormProps = {
   onClose: () => void;
   editableTransaction?: Transaction | null;
 };
 
+const transactionSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  type: z.enum(["income", "expense"]),
+  amount: z.number().positive("Amount must be greater than 0"),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().optional(),
+  date: z.date(),
+});
+
+type TransactionFormData = z.infer<typeof transactionSchema>;
+
 const InputForm = ({ onClose, editableTransaction }: InputFormProps) => {
-  const [formData, setFormData] = useState<TransactionInput>({
-    title: "",
-    type: "expense",
-    amount: 0,
-    category: "",
-    description: "",
-    date: new Date(),
+  const { addTransaction, updateTransaction } = useTransactionContext();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<TransactionFormData>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      title: "",
+      type: "expense",
+      amount: 0,
+      category: "Other",
+      description: "",
+      date: new Date(),
+    },
   });
+
+  const formatDateForInput = (date: Date) => {
+    return date.toISOString().split("T")[0];
+  };
 
   useEffect(() => {
     if (editableTransaction) {
       const { title, type, amount, category, description, date } =
         editableTransaction;
-      setFormData({
-        title,
-        type,
-        amount,
-        category,
-        description: description || "",
-        date: date,
-      });
+      setValue("title", title);
+      setValue("type", type);
+      setValue("amount", amount);
+      setValue("category", category);
+      setValue("description", description || "");
+      setValue("date", new Date(date));
     }
-  }, [editableTransaction]);
-
-  const { addTransaction, updateTransaction } = useTransactionContext();
+  }, [editableTransaction, setValue]);
 
   const expenseCategories = [
     "Food",
@@ -56,30 +78,18 @@ const InputForm = ({ onClose, editableTransaction }: InputFormProps) => {
     "Other",
   ];
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("about to submit");
+  const selectedType = watch("type");
+  const selectedDate = watch("date");
 
-    if (!formData.title.trim() || formData.amount <= 0 || !formData.category) {
-      toast.error("Title, amount and category cannot be empty!");
-      return;
-    }
-
+  const onSubmit = async (data: TransactionFormData) => {
     try {
       if (editableTransaction) {
-        await updateTransaction(editableTransaction.id, {
-          ...formData,
-          amount: Number(formData.amount),
-        });
+        await updateTransaction(editableTransaction.id, data);
         toast.success("Transaction updated");
       } else {
-        await addTransaction({
-          ...formData,
-          amount: Number(formData.amount),
-        });
+        await addTransaction(data);
 
         console.log("added transaction");
-
         toast.success("Transaction added");
       }
 
@@ -92,24 +102,15 @@ const InputForm = ({ onClose, editableTransaction }: InputFormProps) => {
     console.log("submited");
   };
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <label htmlFor="title">
           Title
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-          />
+          <input {...register("title")} />
+          {errors.title && (
+            <p className={styles.error}>{errors.title.message}</p>
+          )}
         </label>
 
         <label>
@@ -117,91 +118,80 @@ const InputForm = ({ onClose, editableTransaction }: InputFormProps) => {
           <div className={styles.typeContainer}>
             <label className={styles.typeLabel}>
               <input
-              className={styles.radioInput}
+                className={styles.radioInput}
                 type="radio"
-                name="type"
+                {...register("type")}
                 value="expense"
-                checked={formData.type === "expense"}
-                onChange={handleChange}
+                checked={selectedType === "expense"}
               />
               <span>Expense</span>
             </label>
 
             <label className={styles.typeLabel}>
               <input
-              className={styles.radioInput}
+                className={styles.radioInput}
                 type="radio"
-                name="type"
+                {...register("type")}
                 value="income"
-                checked={formData.type === "income"}
-                onChange={handleChange}
+                checked={selectedType === "income"}
               />
               <span>Income</span>
             </label>
           </div>
-        </label>
-
-        <label htmlFor="amount">
-          Amount:
-          <input
-            type="number"
-            id="amount"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-          />
+          {errors.type && <p className={styles.error}>{errors.type.message}</p>}
         </label>
 
         <label htmlFor="category">
           Category:
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-          >
-            <option value="">Select a category</option>
-            {formData.type === "income"
-              ? incomeCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))
-              : expenseCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
+          <select {...register("category")}>
+            {(selectedType === "income"
+              ? incomeCategories
+              : expenseCategories
+            ).map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
           </select>
+          {errors.category && (
+            <p className={styles.error}>{errors.category.message}</p>
+          )}
         </label>
 
-        <label htmlFor="date">
-          Date:
-          <input
-            type="date"
-            id="date"
-            name="date"
-            value={
-              formData.date
-                ? new Date(formData.date).toISOString().split("T")[0]
-                : ""
-            }
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                date: new Date(e.target.value),
-              }))
-            }
-          />
-        </label>
+        <div className={styles.row}>
+          <label className={styles.rowHalf} htmlFor="amount">
+            Amount:
+            <input
+              type="number"
+              {...register("amount", { valueAsNumber: true })}
+              onFocus={(e) => e.target.select()}
+            />
+            {errors.amount && (
+              <p className={styles.error}>{errors.amount.message}</p>
+            )}
+          </label>
+
+          <label className={styles.rowHalf} htmlFor="date">
+            Date:
+            <input
+              type="date"
+              {...register("date", { valueAsDate: true })}
+              value={
+                selectedDate
+                  ? formatDateForInput(selectedDate)
+                  : formatDateForInput(new Date())
+              }
+              max={formatDateForInput(new Date())}
+            />
+            {errors.date && (
+              <p className={styles.error}>{errors.date.message}</p>
+            )}
+          </label>
+        </div>
 
         <label htmlFor="description">
           Description:
-          <textarea
-            name="description"
-            value={formData.description}
-            id="description"
-            onChange={handleChange}
-          ></textarea>
+          <textarea {...register("description")}></textarea>
         </label>
 
         <button className={styles.submitBtn} type="submit">
