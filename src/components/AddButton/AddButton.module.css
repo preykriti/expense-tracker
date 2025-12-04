@@ -1,0 +1,9 @@
+.addBtn {
+  padding: 0.8rem 1rem;
+  text-align: center;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  box-shadow: 2px 1px 9px var(--darkest-blue);
+  background-color: var(--darkest-blue);
+}

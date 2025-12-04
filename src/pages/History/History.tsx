@@ -3,25 +3,22 @@ import styles from "./History.module.css";
 import { useTransactionContext } from "../../context/TransactionContext";
 import type { Transaction } from "../../types/Transaction";
 import TransactionCard from "../../components/TransactionCard/TransactionCard";
-import InputForm from "../../components/InputForm/InputForm";
+import { useOutletContext } from "react-router-dom";
+
+type ContextType = {
+  handleEdit: (transaction: Transaction) => void;
+};
 
 const History = () => {
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const [editTransaction, setEditTransaction] = useState<Transaction | null>(
-    null
-  );
   const { transactions } = useTransactionContext();
+  const {handleEdit} = useOutletContext<ContextType>();
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const toggleForm = () => {
-    setShowForm((prev) => !prev);
-  };
 
-  const handleEdit = (id: string) => {
+  const handleEditClick = (id: string) => {
     const tx = transactions.find((t) => t.id === id);
     if (tx) {
-      setEditTransaction(tx);
-      setShowForm(true);
+      handleEdit(tx);
     }
   };
 
@@ -37,7 +34,7 @@ const History = () => {
           className={styles.searchInput}
         />
       </div>
-      <TransactionCard onEdit={handleEdit} searchQuery={searchQuery} />
+      <TransactionCard onEdit={handleEditClick} searchQuery={searchQuery} />
     </div>
   );
 };
