@@ -1,0 +1,14 @@
+.historyContainer {
+  padding: 1rem 2rem;
+}
+
+.topContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchInput {
+  border: 1px solid var(--darkest-blue);
+  width: 20rem;
+}
