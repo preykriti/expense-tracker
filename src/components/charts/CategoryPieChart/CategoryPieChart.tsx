@@ -1,6 +1,14 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 import styles from "./CategoryPieChart.module.css";
-import { useTransactionContext } from '../../../context/TransactionContext';
+import { useTransactionContext } from "../../../context/TransactionContext";
+import { useMemo, useState } from "react";
 
 // const COLORS = [
 //   '#FF6384',
@@ -15,7 +23,8 @@ import { useTransactionContext } from '../../../context/TransactionContext';
 
 const COLORS = [
   "#5B8FF9",
-  '#4BC0C0',
+  "#FF6384",
+  "#4BC0C0",
   "#F6BD16",
   "#7262FD",
   "#78D3F8",
@@ -23,13 +32,41 @@ const COLORS = [
   "#817BFF",
 ];
 
+type TimeFilter = "month" | "year" | "all";
 
 const CategoryPieChart = () => {
   const { transactions } = useTransactionContext();
 
-  const categoryData = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((acc, transaction) => {
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("month");
+
+  const filteredTransactions = useMemo(() => {
+    const now = new Date();
+    const currentYear = new Date().getFullYear();
+    return transactions
+      .filter((t) => t.type === "expense")
+      .filter((t) => {
+        const date = new Date(t.date);
+        switch (timeFilter) {
+          case "month":
+            return (
+              date.getMonth() === now.getMonth() &&
+              date.getFullYear() === now.getFullYear()
+            );
+
+          case "year":
+            return date.getFullYear() === currentYear;
+
+          case "all":
+            return true;
+
+          default:
+            return true;
+        }
+      });
+  }, [transactions, timeFilter]);
+
+  const chartData = useMemo(() => {
+    const categoryData = filteredTransactions.reduce((acc, transaction) => {
       const category = transaction.category;
       if (!acc[category]) {
         acc[category] = 0;
@@ -38,26 +75,33 @@ const CategoryPieChart = () => {
       return acc;
     }, {} as Record<string, number>);
 
-  // array format for recharts
-  const chartData = Object.entries(categoryData)
-    .map(([name, value]) => ({
-      name,
-      value: Number(value.toFixed(2))
-    }))
-    .sort((a, b) => b.value - a.value);
+    return Object.entries(categoryData)
+      .map(([name, value]) => ({
+        name,
+        value: Number(value.toFixed(2)),
+      }))
+      .sort((a, b) => b.value - a.value);
+  }, [filteredTransactions]);
 
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const renderCustomLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+  }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
         fontSize="14"
         fontWeight="bold"
@@ -67,23 +111,17 @@ const CategoryPieChart = () => {
     );
   };
 
-  if (chartData.length === 0) {
-    return (
-      <div className={styles.chartContainer}>
-        <h2 className={styles.chartTitle}>Expenses by Category</h2>
-        <div className={styles.noData}>
-          <p>No expense data available</p>
-          <p className={styles.noDataSubtext}>Start adding expenses to see the breakdown</p>
-        </div>
+  const content =
+    chartData.length === 0 ? (
+      <div className={styles.noData}>
+        <p>No expense data available</p>
+        <p className={styles.noDataSubtext}>
+          Start adding expenses to see the breakdown
+        </p>
       </div>
-    );
-  }
-
-  return (
-    <div className={styles.chartContainer}>
-      <h2 className={styles.chartTitle}>Expenses by Category</h2>
-      <div style={{ width: '100%', height: '400px' }}>
-        <ResponsiveContainer>
+    ) : (
+      <div className={styles.pieChartWrapper}>
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={chartData}
@@ -91,33 +129,48 @@ const CategoryPieChart = () => {
               cy="50%"
               labelLine={false}
               label={renderCustomLabel}
-              outerRadius={120}
-              innerRadius={70}
-              fill="#8884d8"
+              outerRadius="70%"
+              innerRadius="45%"
               dataKey="value"
               paddingAngle={2}
             >
               {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip 
-              formatter={(value: number) => `$${value.toFixed(2)}`}
+
+            <Tooltip
+              formatter={(value: number) => `Rs ${value.toFixed(2)}`}
               contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                padding: '10px'
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "10px",
               }}
             />
-            <Legend 
-              verticalAlign="bottom" 
-              height={36}
-              formatter={(value, entry: any) => `${value}: $${entry.payload.value.toFixed(2)}`}
-            />
+            <Legend verticalAlign="bottom" height={36} />
           </PieChart>
         </ResponsiveContainer>
       </div>
+    );
+
+  return (
+    <div className={styles.chartContainer}>
+      <div className={styles.titleRow}>
+        <p className={styles.chartTitle}>Expenses Overview</p>
+
+        <select
+          className={styles.filterSelect}
+          value={timeFilter}
+          onChange={(e) => setTimeFilter(e.target.value as TimeFilter)}
+        >
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+
+      {content}
     </div>
   );
 };
